@@ -1,0 +1,24 @@
+Source: geoip-database
+Section: net
+Priority: optional
+Homepage: https://www.maxmind.com/
+Maintainer: Patrick Matthäi <pmatthaei@debian.org>
+Build-Depends: debhelper-compat (= 13),
+ geoip-bin (>= 1.6.12-5~),
+ libgeoip-dev (>= 1.6.12-5~)
+Rules-Requires-Root: no
+Standards-Version: 4.5.1
+
+Package: geoip-database
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}
+Recommends: libgeoip1
+Description: IP lookup command line tools that use the GeoIP library (country database)
+ GeoIP is a C library that enables the user to find the country that any
+ IP address or hostname originates from. It uses a file based database.
+ .
+ This database simply contains IP blocks as keys, and countries as values and
+ it should be more complete and accurate than using reverse DNS lookups.
+ .
+ This package contains the free GeoLiteCountry database.

@@ -1,0 +1,36 @@
+#!/usr/bin/make -f
+
+include /usr/share/dpkg/pkg-info.mk
+
+BUILD_DATE := $(shell LC_ALL=C date -d @$(SOURCE_DATE_EPOCH))
+
+%:
+	dh $@
+
+override_dh_install:
+	mkdir -p $(CURDIR)/tmp/
+	# Convert the GeoLite2 database sources to the legacy source format.
+	cat $(CURDIR)/GeoLite2-Country-Blocks-IPv4.csv | /usr/lib/geoip/geolite2-to-legacy-csv.sh \
+		/usr/share/geoip/countryInfo.txt > $(CURDIR)/GeoIPCountryWhois.csv
+	cat $(CURDIR)/GeoLite2-Country-Blocks-IPv6.csv | /usr/lib/geoip/geolite2-to-legacy-csv.sh \
+		/usr/share/geoip/countryInfo.txt > $(CURDIR)/v6.csv
+	# Building geoip v4 country database.
+	/usr/lib/geoip/geoip-generator -v -4 \
+		--info="$$(date -u +'GEO-106FREE %Y%m%d Build' -d '$(BUILD_DATE)')" \
+		-o $(CURDIR)/tmp/GeoIP.dat GeoIPCountryWhois.csv
+	# Convert the v4 csv layout to the v6 one.
+	perl /usr/lib/geoip/v4-to-v6-layout.pl \
+		< GeoIPCountryWhois.csv \
+		> $(CURDIR)/tmp/v4_converted.csv
+	# Merge the converted v4 with the v6 database.
+	cat v6.csv $(CURDIR)/tmp/v4_converted.csv \
+		> $(CURDIR)/tmp/v4v6merged.csv
+	# Building geoip v6 country database.
+	/usr/lib/geoip/geoip-generator -v -6 \
+		--info="$$(date -u +'GEO-106FREE %Y%m%d Build' -d '$(BUILD_DATE)')" \
+		-o $(CURDIR)/tmp/GeoIPv6.dat $(CURDIR)/tmp/v4v6merged.csv
+	dh_install
+
+override_dh_clean:
+	rm -rf $(CURDIR)/tmp/
+	dh_clean
