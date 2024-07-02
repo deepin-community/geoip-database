@@ -1,13 +1,11 @@
 Source: geoip-database
 Section: net
 Priority: optional
-Homepage: https://www.maxmind.com/
+Homepage: https://mailfud.org/geoip-legacy/
 Maintainer: Patrick Matthäi <pmatthaei@debian.org>
-Build-Depends: debhelper-compat (= 13),
- geoip-bin (>= 1.6.12-5~),
- libgeoip-dev (>= 1.6.12-5~)
+Build-Depends: debhelper-compat (= 13)
 Rules-Requires-Root: no
-Standards-Version: 4.5.1
+Standards-Version: 4.6.2
 
 Package: geoip-database
 Architecture: all
